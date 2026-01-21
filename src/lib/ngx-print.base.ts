@@ -114,6 +114,34 @@ export class PrintBase {
     }
   }
 
+  // todo here benutzen?
+  private syncFormValues(source: HTMLElement, clone: HTMLElement): void {
+    // Select all form elements
+    const selector = 'input, select, textarea';
+    const sourceEls = source.querySelectorAll(selector);
+    const cloneEls = clone.querySelectorAll(selector);
+
+    for (let i = 0; i < sourceEls.length; i++) {
+      const srcNode = sourceEls[i] as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+      const cloneNode = cloneEls[i] as typeof srcNode;
+
+      if (srcNode instanceof HTMLInputElement) {
+        if (srcNode.type === 'checkbox' || srcNode.type === 'radio') {
+          if (srcNode.checked) cloneNode.setAttribute('checked', '');
+        } else {
+          cloneNode.setAttribute('value', srcNode.value);
+        }
+      } else if (srcNode instanceof HTMLTextAreaElement) {
+        cloneNode.innerHTML = srcNode.value; // Textarea content is innerHTML/text
+      } else if (srcNode instanceof HTMLSelectElement) {
+        const options = cloneNode.querySelectorAll('option');
+        if (options[srcNode.selectedIndex]) {
+          options[srcNode.selectedIndex].setAttribute('selected', '');
+        }
+      }
+    }
+  }
+
   /**
    * Converts a canvas element to an image and returns its HTML string.
    *
